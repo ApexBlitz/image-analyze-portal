@@ -4,7 +4,8 @@ import { OllamaResponse } from "@/types";
 
 export async function analyzeImage(
   imageBase64: string,
-  ollamaUrl: string
+  ollamaUrl: string,
+  modelId: string = "llava"
 ): Promise<string> {
   try {
     // First, validate the Ollama URL
@@ -23,7 +24,7 @@ export async function analyzeImage(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "llava",
+        model: modelId,
         prompt: "Describe this image in detail. What do you see? List objects, people, context, and any interesting details.",
         stream: false,
         images: [imageBase64.split(",")[1]],

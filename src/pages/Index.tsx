@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import OllamaUrlInput from "@/components/OllamaUrlInput";
 import ImageUpload from "@/components/ImageUpload";
 import ImageAnalysis from "@/components/ImageAnalysis";
+import ModelSelector from "@/components/ModelSelector";
 import { analyzeImage } from "@/lib/api";
 import { toast } from "sonner";
 
@@ -12,10 +13,16 @@ const Index = () => {
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [analysisResult, setAnalysisResult] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
+  const [selectedModel, setSelectedModel] = useState<string>("llava");
 
   const handleOllamaUrlSubmit = (url: string) => {
     setOllamaUrl(url);
     toast.success("Ollama URL set successfully!");
+  };
+
+  const handleModelChange = (modelId: string) => {
+    setSelectedModel(modelId);
+    toast.success(`Modèle changé pour ${modelId}`);
   };
 
   const handleImageUpload = async (base64: string) => {
@@ -29,7 +36,7 @@ const Index = () => {
 
     try {
       setIsAnalyzing(true);
-      const result = await analyzeImage(base64, ollamaUrl);
+      const result = await analyzeImage(base64, ollamaUrl, selectedModel);
       setAnalysisResult(result);
       toast.success("Image analysis complete!");
     } catch (error) {
@@ -52,6 +59,12 @@ const Index = () => {
           isAnalyzing={isAnalyzing} 
         />
         
+        <ModelSelector
+          selectedModel={selectedModel}
+          onModelChange={handleModelChange}
+          isAnalyzing={isAnalyzing}
+        />
+        
         <ImageUpload 
           onImageUpload={handleImageUpload} 
           isAnalyzing={isAnalyzing}
@@ -65,7 +78,7 @@ const Index = () => {
       </div>
       
       <footer className="w-full mt-auto py-6 text-center text-gray-500 text-sm">
-        <p>Image analysis powered by Ollama with LLaVA</p>
+        <p>Image analysis powered by Ollama with {selectedModel}</p>
       </footer>
     </main>
   );

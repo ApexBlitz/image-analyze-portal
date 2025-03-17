@@ -12,3 +12,9 @@ export interface OllamaResponse {
   response: string;
   done: boolean;
 }
+
+export interface OllamaModel {
+  id: string;
+  name: string;
+  description: string;
+}

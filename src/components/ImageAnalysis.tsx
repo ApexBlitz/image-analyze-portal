@@ -16,9 +16,9 @@ const ImageAnalysis: React.FC<ImageAnalysisProps> = ({ result, isAnalyzing }) =>
       <Card className="glass overflow-hidden">
         <div className="p-5">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-lg font-medium">Analysis Results</h3>
+            <h3 className="text-lg font-medium">Résultats d'analyse</h3>
             <div className="inline-block px-2 py-1 rounded-full bg-blue-100 text-xs font-medium text-blue-700">
-              Ollama LLaVA
+              IA Ollama
             </div>
           </div>
           <Separator className="my-2" />
@@ -27,7 +27,7 @@ const ImageAnalysis: React.FC<ImageAnalysisProps> = ({ result, isAnalyzing }) =>
             {isAnalyzing ? (
               <div className="flex flex-col items-center justify-center py-8">
                 <div className="w-8 h-8 border-t-2 border-blue-500 rounded-full animate-spin mb-3"></div>
-                <p className="text-gray-500 text-sm">Analyzing image...</p>
+                <p className="text-gray-500 text-sm">Analyse de l'image en cours...</p>
               </div>
             ) : (
               <div className="prose prose-sm max-w-none">
