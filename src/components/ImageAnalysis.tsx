@@ -28,10 +28,15 @@ const ImageAnalysis: React.FC<ImageAnalysisProps> = ({ result, isAnalyzing }) =>
               <div className="flex flex-col items-center justify-center py-8">
                 <div className="w-8 h-8 border-t-2 border-blue-500 rounded-full animate-spin mb-3"></div>
                 <p className="text-gray-500 text-sm">Analyse de l'image en cours...</p>
+                <p className="text-xs text-gray-400 mt-2">Cela peut prendre quelques instants selon le modèle choisi</p>
               </div>
-            ) : (
+            ) : result ? (
               <div className="prose prose-sm max-w-none">
                 <p className="whitespace-pre-line">{result}</p>
+              </div>
+            ) : (
+              <div className="text-center py-4 text-gray-500">
+                Aucun résultat
               </div>
             )}
           </div>
