@@ -1,4 +1,3 @@
-
 import { toast } from "sonner";
 import { OllamaResponse } from "@/types";
 
@@ -76,7 +75,7 @@ export async function checkModelAvailability(
   }
 }
 
-// Add a new function to search for image information on the web
+// Function to search for image information on the web with a more structured approach
 export async function searchImageOnWeb(
   imageBase64: string,
   ollamaUrl: string,
@@ -94,17 +93,20 @@ export async function searchImageOnWeb(
     
     console.log("Sending web search request to Ollama with model:", modelId);
     
-    // Using a more advanced prompt for web search
+    // Using a more structured prompt for web search to get ranked results
     const prompt = `
 I'm showing you an image. Based on what you see in this image:
-1. What would be good search terms to find more information about what's in this image?
-2. If you recognize any specific objects, landmarks, people, or items, what additional context can you provide?
-3. Provide some interesting facts or background information about what's visible in this image, as if you were searching the web for this information.
 
-Structure your response in sections: 
-- "Suggested Search Terms"
-- "Recognition Results" 
-- "Additional Context & Information"
+1. Give me a detailed analysis of the image content.
+2. What would be good search terms to find more information about what's in this image?
+3. Provide a ranked list of at least 5 potential websites or sources where one could find more information about this subject.
+4. For each source:
+   - Give a title for the source
+   - Provide a brief description of what information this source would provide
+   - If possible, suggest a hypothetical URL where this information might be found
+
+Format your response so each potential source is clearly separated and numbered.
+The list should be ranked by relevance, with the most relevant sources first.
 `;
 
     const response = await fetch(`${normalizedUrl}/api/generate`, {
