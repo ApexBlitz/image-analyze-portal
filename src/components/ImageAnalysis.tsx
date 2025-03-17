@@ -1,15 +1,51 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import { Search, Loader2 } from "lucide-react";
+import { searchImageOnWeb } from "@/lib/api";
+import { toast } from "sonner";
 
 interface ImageAnalysisProps {
   result: string | null;
   isAnalyzing: boolean;
+  imageBase64: string | null;
+  ollamaUrl: string | null;
+  selectedModel: string;
 }
 
-const ImageAnalysis: React.FC<ImageAnalysisProps> = ({ result, isAnalyzing }) => {
+const ImageAnalysis: React.FC<ImageAnalysisProps> = ({ 
+  result, 
+  isAnalyzing, 
+  imageBase64, 
+  ollamaUrl, 
+  selectedModel 
+}) => {
+  const [webSearchResults, setWebSearchResults] = useState<string | null>(null);
+  const [isSearching, setIsSearching] = useState<boolean>(false);
+  
   if (!result && !isAnalyzing) return null;
+
+  const handleWebSearch = async () => {
+    if (!imageBase64 || !ollamaUrl) return;
+    
+    try {
+      setIsSearching(true);
+      const searchResults = await searchImageOnWeb(
+        imageBase64, 
+        ollamaUrl, 
+        selectedModel
+      );
+      setWebSearchResults(searchResults);
+      toast.success("Recherche web terminée!");
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      toast.error(`Erreur de recherche: ${errorMessage}`);
+    } finally {
+      setIsSearching(false);
+    }
+  };
 
   return (
     <div className="w-full max-w-xl mx-auto mt-4 animate-slide-up">
@@ -40,6 +76,40 @@ const ImageAnalysis: React.FC<ImageAnalysisProps> = ({ result, isAnalyzing }) =>
               </div>
             )}
           </div>
+          
+          {result && !isSearching && !webSearchResults && (
+            <div className="mt-4 flex justify-center">
+              <Button 
+                className="flex items-center gap-2"
+                onClick={handleWebSearch}
+                disabled={isSearching || !imageBase64 || !ollamaUrl}
+              >
+                <Search className="h-4 w-4" />
+                Rechercher plus d'informations sur le web
+              </Button>
+            </div>
+          )}
+          
+          {isSearching && (
+            <div className="mt-4">
+              <Separator className="my-3" />
+              <div className="flex flex-col items-center justify-center py-4">
+                <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
+                <p className="text-sm mt-2">Recherche de données sur internet...</p>
+                <p className="text-xs text-gray-400 mt-1">Utilisation du modèle {selectedModel}</p>
+              </div>
+            </div>
+          )}
+          
+          {webSearchResults && (
+            <div className="mt-4">
+              <Separator className="my-3" />
+              <h4 className="text-md font-medium mb-2">Informations complémentaires</h4>
+              <div className="prose prose-sm max-w-none bg-blue-50/50 p-3 rounded-md border border-blue-100">
+                <p className="whitespace-pre-line">{webSearchResults}</p>
+              </div>
+            </div>
+          )}
         </div>
       </Card>
     </div>

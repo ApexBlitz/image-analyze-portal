@@ -115,7 +115,10 @@ const Index = () => {
         
         <ImageAnalysis 
           result={analysisResult} 
-          isAnalyzing={isAnalyzing} 
+          isAnalyzing={isAnalyzing}
+          imageBase64={imageBase64}
+          ollamaUrl={ollamaUrl}
+          selectedModel={selectedModel}
         />
       </div>
       

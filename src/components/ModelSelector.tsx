@@ -31,6 +31,31 @@ const SUPPORTED_MODELS: OllamaModel[] = [
     name: "CogVLM",
     description: "Modèle vision-langage pour compréhension d'image",
   },
+  {
+    id: "deepseek-r1",
+    name: "DeepSeek-R1",
+    description: "Modèle avancé pour analyse et recherche web",
+  },
+  {
+    id: "llama3",
+    name: "Llama 3.3",
+    description: "Modèle multimodal pour compréhension complexe",
+  },
+  {
+    id: "phi-4",
+    name: "Phi-4",
+    description: "Modèle Microsoft avec capacités visuelles",
+  },
+  {
+    id: "mistral",
+    name: "Mistral",
+    description: "Modèle performant pour analyse et génération",
+  },
+  {
+    id: "gemma3:8b-vision",
+    name: "Gemma 3",
+    description: "Modèle vision-langage de Google",
+  },
 ];
 
 interface ModelSelectorProps {
