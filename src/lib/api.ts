@@ -136,3 +136,54 @@ The list should be ranked by relevance, with the most relevant sources first.
     throw error;
   }
 }
+
+// Function to ask specific questions about an image
+export async function askQuestionAboutImage(
+  imageBase64: string,
+  question: string,
+  ollamaUrl: string,
+  modelId: string = "llava"
+): Promise<string> {
+  try {
+    // First, validate the Ollama URL
+    if (!ollamaUrl.startsWith("http://") && !ollamaUrl.startsWith("https://")) {
+      throw new Error("Invalid Ollama URL. It must start with http:// or https://");
+    }
+
+    const normalizedUrl = ollamaUrl.endsWith("/")
+      ? ollamaUrl.slice(0, -1)
+      : ollamaUrl;
+    
+    console.log("Sending question to Ollama:", `${normalizedUrl}/api/generate`);
+    console.log("Using model:", modelId);
+    console.log("Question:", question);
+    
+    // Prepare the request to Ollama
+    const response = await fetch(`${normalizedUrl}/api/generate`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: modelId,
+        prompt: question,
+        stream: false,
+        images: [imageBase64.split(",")[1]],
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Ollama API error:", response.status, errorText);
+      throw new Error(`Ollama API error: ${response.status} - ${errorText || response.statusText}`);
+    }
+
+    const data = await response.json() as OllamaResponse;
+    return data.response;
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("Question handling error details:", errorMessage);
+    toast.error(`Question échouée: ${errorMessage}`);
+    throw error;
+  }
+}

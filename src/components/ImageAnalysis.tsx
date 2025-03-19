@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { Search, Loader2, Globe, ExternalLink } from "lucide-react";
+import { Search, Loader2, Globe, ExternalLink, MessageCircleQuestion } from "lucide-react";
 import { searchImageOnWeb } from "@/lib/api";
 import { toast } from "sonner";
 import {
@@ -14,6 +14,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import ImageQuestions from "./ImageQuestions";
 
 interface ImageAnalysisProps {
   result: string | null;
@@ -40,6 +41,7 @@ const ImageAnalysis: React.FC<ImageAnalysisProps> = ({
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [parsedResults, setParsedResults] = useState<SearchResult[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [activeTab, setActiveTab] = useState<"analysis" | "questions">("analysis");
   const resultsPerPage = 3;
   
   if (!result && !isAnalyzing) return null;
@@ -57,7 +59,6 @@ const ImageAnalysis: React.FC<ImageAnalysisProps> = ({
       setWebSearchResults(searchResults);
       
       // Parse the search results to extract website information
-      // The AI model returns unstructured text, so we'll try to extract links and descriptions
       const extractedResults = parseSearchResults(searchResults);
       setParsedResults(extractedResults);
       
@@ -192,131 +193,158 @@ const ImageAnalysis: React.FC<ImageAnalysisProps> = ({
       <Card className="glass overflow-hidden">
         <div className="p-5">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-lg font-medium">Résultats d'analyse</h3>
+            <div className="flex gap-4">
+              <button 
+                onClick={() => setActiveTab("analysis")} 
+                className={`text-lg font-medium pb-1 relative ${activeTab === "analysis" ? "text-blue-600" : "text-gray-500"}`}
+              >
+                Résultats d'analyse
+                {activeTab === "analysis" && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-full"></span>}
+              </button>
+              <button 
+                onClick={() => setActiveTab("questions")} 
+                className={`text-lg font-medium pb-1 flex items-center gap-1 relative ${activeTab === "questions" ? "text-blue-600" : "text-gray-500"}`}
+              >
+                <MessageCircleQuestion className="h-4 w-4" />
+                Questions
+                {activeTab === "questions" && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-full"></span>}
+              </button>
+            </div>
             <div className="inline-block px-2 py-1 rounded-full bg-blue-100 text-xs font-medium text-blue-700">
               IA Ollama
             </div>
           </div>
           <Separator className="my-2" />
           
-          <div className="min-h-[100px] max-h-[400px] overflow-y-auto">
-            {isAnalyzing ? (
-              <div className="flex flex-col items-center justify-center py-8">
-                <div className="w-8 h-8 border-t-2 border-blue-500 rounded-full animate-spin mb-3"></div>
-                <p className="text-gray-500 text-sm">Analyse de l'image en cours...</p>
-                <p className="text-xs text-gray-400 mt-2">Cela peut prendre quelques instants selon le modèle choisi</p>
-              </div>
-            ) : result ? (
-              <div className="prose prose-sm max-w-none">
-                <p className="whitespace-pre-line">{result}</p>
-              </div>
-            ) : (
-              <div className="text-center py-4 text-gray-500">
-                Aucun résultat
-              </div>
-            )}
-          </div>
-          
-          {result && !isSearching && !webSearchResults && (
-            <div className="mt-4 flex justify-center">
-              <Button 
-                className="flex items-center gap-2"
-                onClick={handleWebSearch}
-                disabled={isSearching || !imageBase64 || !ollamaUrl}
-              >
-                <Search className="h-4 w-4" />
-                Rechercher plus d'informations sur le web
-              </Button>
-            </div>
-          )}
-          
-          {isSearching && (
-            <div className="mt-4">
-              <Separator className="my-3" />
-              <div className="flex flex-col items-center justify-center py-4">
-                <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
-                <p className="text-sm mt-2">Recherche de données sur internet...</p>
-                <p className="text-xs text-gray-400 mt-1">Utilisation du modèle {selectedModel}</p>
-              </div>
-            </div>
-          )}
-          
-          {webSearchResults && parsedResults.length > 0 && (
-            <div className="mt-4">
-              <Separator className="my-3" />
-              <h4 className="text-md font-medium mb-2 flex items-center gap-2">
-                <Globe className="h-4 w-4" /> 
-                Informations complémentaires
-                <span className="text-xs text-gray-500">({parsedResults.length} résultats)</span>
-              </h4>
-              
-              <div className="space-y-4">
-                {currentResults.map((result, index) => (
-                  <div key={index} className="bg-blue-50/50 p-3 rounded-md border border-blue-100">
-                    <div className="flex items-start justify-between">
-                      <h5 className="font-medium text-blue-800">{result.title}</h5>
-                      <span className="text-xs bg-blue-100 px-2 py-0.5 rounded-full">#{startIndex + index + 1}</span>
-                    </div>
-                    <p className="text-sm mt-1">{result.description}</p>
-                    {result.url && result.url !== "#" && (
-                      <a 
-                        href={result.url} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-xs text-blue-600 hover:underline flex items-center gap-1 mt-2"
-                      >
-                        <ExternalLink className="h-3 w-3" /> Visiter le site
-                      </a>
-                    )}
+          {activeTab === "analysis" ? (
+            <>
+              <div className="min-h-[100px] max-h-[400px] overflow-y-auto">
+                {isAnalyzing ? (
+                  <div className="flex flex-col items-center justify-center py-8">
+                    <div className="w-8 h-8 border-t-2 border-blue-500 rounded-full animate-spin mb-3"></div>
+                    <p className="text-gray-500 text-sm">Analyse de l'image en cours...</p>
+                    <p className="text-xs text-gray-400 mt-2">Cela peut prendre quelques instants selon le modèle choisi</p>
                   </div>
-                ))}
+                ) : result ? (
+                  <div className="prose prose-sm max-w-none">
+                    <p className="whitespace-pre-line">{result}</p>
+                  </div>
+                ) : (
+                  <div className="text-center py-4 text-gray-500">
+                    Aucun résultat
+                  </div>
+                )}
               </div>
               
-              {totalPages > 1 && (
-                <div className="mt-4">
-                  <Pagination>
-                    <PaginationContent>
-                      {currentPage > 1 && (
-                        <PaginationItem>
-                          <PaginationPrevious 
-                            onClick={() => handlePageChange(currentPage - 1)} 
-                          />
-                        </PaginationItem>
-                      )}
-                      
-                      {[...Array(totalPages)].map((_, i) => (
-                        <PaginationItem key={i}>
-                          <PaginationLink 
-                            isActive={currentPage === i + 1}
-                            onClick={() => handlePageChange(i + 1)}
-                          >
-                            {i + 1}
-                          </PaginationLink>
-                        </PaginationItem>
-                      ))}
-                      
-                      {currentPage < totalPages && (
-                        <PaginationItem>
-                          <PaginationNext 
-                            onClick={() => handlePageChange(currentPage + 1)} 
-                          />
-                        </PaginationItem>
-                      )}
-                    </PaginationContent>
-                  </Pagination>
+              {result && !isSearching && !webSearchResults && (
+                <div className="mt-4 flex justify-center">
+                  <Button 
+                    className="flex items-center gap-2"
+                    onClick={handleWebSearch}
+                    disabled={isSearching || !imageBase64 || !ollamaUrl}
+                  >
+                    <Search className="h-4 w-4" />
+                    Rechercher plus d'informations sur le web
+                  </Button>
                 </div>
               )}
-            </div>
-          )}
-          
-          {webSearchResults && parsedResults.length === 0 && (
-            <div className="mt-4">
-              <Separator className="my-3" />
-              <h4 className="text-md font-medium mb-2">Informations complémentaires</h4>
-              <div className="prose prose-sm max-w-none bg-blue-50/50 p-3 rounded-md border border-blue-100">
-                <p className="whitespace-pre-line">{webSearchResults}</p>
-              </div>
-            </div>
+              
+              {isSearching && (
+                <div className="mt-4">
+                  <Separator className="my-3" />
+                  <div className="flex flex-col items-center justify-center py-4">
+                    <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
+                    <p className="text-sm mt-2">Recherche de données sur internet...</p>
+                    <p className="text-xs text-gray-400 mt-1">Utilisation du modèle {selectedModel}</p>
+                  </div>
+                </div>
+              )}
+              
+              {webSearchResults && parsedResults.length > 0 && (
+                <div className="mt-4">
+                  <Separator className="my-3" />
+                  <h4 className="text-md font-medium mb-2 flex items-center gap-2">
+                    <Globe className="h-4 w-4" /> 
+                    Informations complémentaires
+                    <span className="text-xs text-gray-500">({parsedResults.length} résultats)</span>
+                  </h4>
+                  
+                  <div className="space-y-4">
+                    {currentResults.map((result, index) => (
+                      <div key={index} className="bg-blue-50/50 p-3 rounded-md border border-blue-100">
+                        <div className="flex items-start justify-between">
+                          <h5 className="font-medium text-blue-800">{result.title}</h5>
+                          <span className="text-xs bg-blue-100 px-2 py-0.5 rounded-full">#{startIndex + index + 1}</span>
+                        </div>
+                        <p className="text-sm mt-1">{result.description}</p>
+                        {result.url && result.url !== "#" && (
+                          <a 
+                            href={result.url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-xs text-blue-600 hover:underline flex items-center gap-1 mt-2"
+                          >
+                            <ExternalLink className="h-3 w-3" /> Visiter le site
+                          </a>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {totalPages > 1 && (
+                    <div className="mt-4">
+                      <Pagination>
+                        <PaginationContent>
+                          {currentPage > 1 && (
+                            <PaginationItem>
+                              <PaginationPrevious 
+                                onClick={() => handlePageChange(currentPage - 1)} 
+                              />
+                            </PaginationItem>
+                          )}
+                          
+                          {[...Array(totalPages)].map((_, i) => (
+                            <PaginationItem key={i}>
+                              <PaginationLink 
+                                isActive={currentPage === i + 1}
+                                onClick={() => handlePageChange(i + 1)}
+                              >
+                                {i + 1}
+                              </PaginationLink>
+                            </PaginationItem>
+                          ))}
+                          
+                          {currentPage < totalPages && (
+                            <PaginationItem>
+                              <PaginationNext 
+                                onClick={() => handlePageChange(currentPage + 1)} 
+                              />
+                            </PaginationItem>
+                          )}
+                        </PaginationContent>
+                      </Pagination>
+                    </div>
+                  )}
+                </div>
+              )}
+              
+              {webSearchResults && parsedResults.length === 0 && (
+                <div className="mt-4">
+                  <Separator className="my-3" />
+                  <h4 className="text-md font-medium mb-2">Informations complémentaires</h4>
+                  <div className="prose prose-sm max-w-none bg-blue-50/50 p-3 rounded-md border border-blue-100">
+                    <p className="whitespace-pre-line">{webSearchResults}</p>
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            <ImageQuestions 
+              imageBase64={imageBase64}
+              ollamaUrl={ollamaUrl}
+              selectedModel={selectedModel}
+              isVisible={activeTab === "questions"}
+            />
           )}
         </div>
       </Card>
