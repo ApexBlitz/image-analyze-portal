@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { askQuestionAboutImage } from "@/lib/api";
-import { Loader2, MessageCircleQuestion, SendHorizontal } from "lucide-react";
+import { Loader2, MessageCircleQuestion, SendHorizontal, Clock, Bot, UserRound } from "lucide-react";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
@@ -84,14 +84,14 @@ const ImageQuestions: React.FC<ImageQuestionsProps> = ({
 
   return (
     <div className="w-full max-w-xl mx-auto mt-4 animate-fade-in">
-      <Card className="glass overflow-hidden">
+      <Card className="glass overflow-hidden border-none shadow-md bg-white/90">
         <div className="p-5">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-lg font-medium flex items-center gap-2">
-              <MessageCircleQuestion className="h-5 w-5 text-blue-500" />
-              Poser des questions sur l'image
+              <MessageCircleQuestion className="h-5 w-5 text-purple-500" />
+              Questions sur l'image
             </h3>
-            <div className="inline-block px-2 py-1 rounded-full bg-blue-100 text-xs font-medium text-blue-700">
+            <div className="inline-block px-2 py-1 rounded-full bg-purple-100 text-xs font-medium text-purple-700">
               Modèle: {selectedModel}
             </div>
           </div>
@@ -109,13 +109,13 @@ const ImageQuestions: React.FC<ImageQuestionsProps> = ({
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="flex-grow min-h-[80px]"
+              className="flex-grow min-h-[80px] border-purple-200 focus-visible:ring-purple-500"
               disabled={isAsking}
             />
             <Button
               onClick={handleAskQuestion}
               disabled={isAsking || !question.trim()}
-              className="self-end"
+              className="self-end bg-purple-600 hover:bg-purple-700"
             >
               {isAsking ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -127,18 +127,27 @@ const ImageQuestions: React.FC<ImageQuestionsProps> = ({
 
           {questionHistory.length > 0 && (
             <>
-              <h4 className="text-sm font-medium text-gray-500 mb-2">Historique des questions</h4>
-              <div className="space-y-4 max-h-[400px] overflow-y-auto">
+              <h4 className="text-sm font-medium text-gray-500 mb-2 flex items-center gap-2">
+                <Clock className="h-3 w-3" /> Historique des questions
+              </h4>
+              <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
                 {questionHistory.map((qa, index) => (
-                  <div key={index} className="bg-gray-50 rounded-md p-3 border border-gray-100">
-                    <div className="flex justify-between items-start">
-                      <p className="font-medium text-blue-700">{qa.question}</p>
-                      <span className="text-xs text-gray-400">
-                        {new Date(qa.timestamp).toLocaleTimeString()}
-                      </span>
+                  <div key={index} className="rounded-md overflow-hidden">
+                    <div className="bg-purple-50 p-3 flex items-start gap-3">
+                      <UserRound className="h-5 w-5 text-purple-600 mt-0.5" />
+                      <div className="flex-1">
+                        <div className="flex justify-between items-start">
+                          <p className="font-medium text-purple-700">{qa.question}</p>
+                          <span className="text-xs text-gray-400 whitespace-nowrap ml-3">
+                            {new Date(qa.timestamp).toLocaleTimeString()}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <Separator className="my-2" />
-                    <p className="text-sm whitespace-pre-line">{qa.answer}</p>
+                    <div className="bg-white p-3 border border-gray-100 flex items-start gap-3">
+                      <Bot className="h-5 w-5 text-blue-600 mt-0.5" />
+                      <p className="text-sm whitespace-pre-line flex-1">{qa.answer}</p>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -146,15 +155,19 @@ const ImageQuestions: React.FC<ImageQuestionsProps> = ({
           )}
 
           {questionHistory.length === 0 && !isAsking && (
-            <div className="text-center py-4 text-gray-500">
-              <p>Posez votre première question sur cette image</p>
-              <p className="text-xs mt-1">Exemples: "Que vois-tu dans cette image?", "Peux-tu identifier les objets?", "Quelle est l'ambiance de cette scène?"</p>
+            <div className="text-center py-6 text-gray-500 bg-gray-50/50 rounded-lg">
+              <MessageCircleQuestion className="h-8 w-8 mx-auto text-gray-400 mb-2" />
+              <p className="font-medium text-gray-600">Posez votre première question sur cette image</p>
+              <p className="text-xs mt-2 text-gray-500 max-w-md mx-auto">
+                Exemples: "Que vois-tu dans cette image?", "Peux-tu identifier les objets?", 
+                "Quelle est l'ambiance de cette scène?", "Peux-tu décrire les couleurs?"
+              </p>
             </div>
           )}
 
           {isAsking && (
             <div className="flex flex-col items-center justify-center py-8">
-              <div className="w-8 h-8 border-t-2 border-blue-500 rounded-full animate-spin mb-3"></div>
+              <div className="w-8 h-8 border-t-2 border-purple-500 rounded-full animate-spin mb-3"></div>
               <p className="text-gray-500 text-sm">Analyse de la question en cours...</p>
             </div>
           )}

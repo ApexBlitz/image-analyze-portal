@@ -1,17 +1,53 @@
 
 import React from "react";
+import { Zap, Image, Search, MessageCircleQuestion } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const Header: React.FC = () => {
   return (
-    <header className="w-full py-6 flex justify-center items-center animate-fade-in">
+    <header className="w-full pt-6 pb-12 flex flex-col justify-center items-center animate-fade-in">
       <div className="text-center">
-        <div className="inline-block px-3 py-1 mb-2 bg-blue-100 text-blue-600 rounded-full text-xs font-medium tracking-wider animate-slide-down">
-          IMAGE ANALYSIS
+        <div className="flex items-center justify-center gap-2 mb-3">
+          <Zap className="h-6 w-6 text-blue-500" />
+          <span className="text-xl font-semibold text-blue-600">Vision Insight</span>
         </div>
-        <h1 className="text-4xl font-light tracking-tight mb-1">Vision Insight</h1>
-        <p className="text-gray-500 max-w-md mx-auto text-sm">
-          Upload your image and discover what AI sees in it
+        
+        <h1 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4 text-gray-800">
+          Analyse d'Images <span className="text-blue-600">Intelligente</span>
+        </h1>
+        
+        <p className="text-gray-600 max-w-xl mx-auto text-lg mb-8">
+          Découvrez ce que l'IA voit dans vos images grâce à notre plateforme d'analyse visuelle avancée
         </p>
+        
+        <div className="flex flex-wrap gap-3 justify-center mb-6">
+          <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-full text-blue-700 text-sm">
+            <Image className="h-4 w-4" />
+            <span>Analyse visuelle</span>
+          </div>
+          <div className="flex items-center gap-2 px-4 py-2 bg-indigo-50 rounded-full text-indigo-700 text-sm">
+            <Search className="h-4 w-4" />
+            <span>Recherche web</span>
+          </div>
+          <div className="flex items-center gap-2 px-4 py-2 bg-purple-50 rounded-full text-purple-700 text-sm">
+            <MessageCircleQuestion className="h-4 w-4" />
+            <span>Questions sur l'image</span>
+          </div>
+        </div>
+        
+        <div className="flex justify-center">
+          <Button size="lg" className="bg-blue-600 hover:bg-blue-700" onClick={() => {
+            const analyzeTab = document.querySelector('[data-value="analyze"]') as HTMLElement;
+            if (analyzeTab) analyzeTab.click();
+            // Scroll to upload section
+            setTimeout(() => {
+              const uploadSection = document.querySelector('input[type="file"]')?.closest('div');
+              uploadSection?.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+          }}>
+            Commencer l'analyse
+          </Button>
+        </div>
       </div>
     </header>
   );
