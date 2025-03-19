@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import Header from "@/components/Header";
 import OllamaUrlInput from "@/components/OllamaUrlInput";
@@ -7,6 +6,7 @@ import ImageAnalysis from "@/components/ImageAnalysis";
 import ModelSelector from "@/components/ModelSelector";
 import HowItWorks from "@/components/HowItWorks";
 import Features from "@/components/Features";
+import InstallationGuide from "@/components/InstallationGuide";
 import { analyzeImage, checkModelAvailability } from "@/lib/api";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -27,7 +27,6 @@ const Index = () => {
     setError(null);
     
     try {
-      // Check if we can connect to the Ollama server
       const testResponse = await fetch(`${url}/api/tags`);
       if (!testResponse.ok) {
         throw new Error(`Impossible de se connecter au serveur Ollama: ${testResponse.statusText}`);
@@ -94,8 +93,9 @@ const Index = () => {
         <Header />
         
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mt-8">
-          <TabsList className="grid w-full max-w-md mx-auto grid-cols-3">
+          <TabsList className="grid w-full max-w-md mx-auto grid-cols-4">
             <TabsTrigger value="analyze" className="rounded-md">Analyse d'image</TabsTrigger>
+            <TabsTrigger value="installation" className="rounded-md">Installation</TabsTrigger>
             <TabsTrigger value="howItWorks" className="rounded-md">Comment ça marche</TabsTrigger>
             <TabsTrigger value="features" className="rounded-md">Fonctionnalités</TabsTrigger>
           </TabsList>
@@ -136,6 +136,10 @@ const Index = () => {
               ollamaUrl={ollamaUrl}
               selectedModel={selectedModel}
             />
+          </TabsContent>
+          
+          <TabsContent value="installation" className="pt-6">
+            <InstallationGuide />
           </TabsContent>
           
           <TabsContent value="howItWorks" className="pt-6">
