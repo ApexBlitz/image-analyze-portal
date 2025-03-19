@@ -1,3 +1,4 @@
+
 import { toast } from "sonner";
 import { OllamaResponse } from "@/types";
 
@@ -19,7 +20,7 @@ export async function analyzeImage(
     console.log("Sending request to Ollama:", `${normalizedUrl}/api/generate`);
     console.log("Using model:", modelId);
     
-    // Prepare the request to Ollama
+    // Prepare the request to Ollama with a prompt in French
     const response = await fetch(`${normalizedUrl}/api/generate`, {
       method: "POST",
       headers: {
@@ -27,7 +28,7 @@ export async function analyzeImage(
       },
       body: JSON.stringify({
         model: modelId,
-        prompt: "Describe this image in detail. What do you see? List objects, people, context, and any interesting details.",
+        prompt: "Décris cette image en détail en français. Que vois-tu ? Liste les objets, les personnes, le contexte, et tous les détails intéressants.",
         stream: false,
         images: [imageBase64.split(",")[1]],
       }),
@@ -93,20 +94,21 @@ export async function searchImageOnWeb(
     
     console.log("Sending web search request to Ollama with model:", modelId);
     
-    // Using a more structured prompt for web search to get ranked results
+    // Updated prompt in French
     const prompt = `
-I'm showing you an image. Based on what you see in this image:
+Je te montre une image. En te basant sur ce que tu vois dans cette image:
 
-1. Give me a detailed analysis of the image content.
-2. What would be good search terms to find more information about what's in this image?
-3. Provide a ranked list of at least 5 potential websites or sources where one could find more information about this subject.
-4. For each source:
-   - Give a title for the source
-   - Provide a brief description of what information this source would provide
-   - If possible, suggest a hypothetical URL where this information might be found
+1. Donne-moi une analyse détaillée du contenu de l'image en français.
+2. Quels seraient de bons termes de recherche pour trouver plus d'informations sur ce qui est présent dans cette image?
+3. Fournis une liste classée d'au moins 5 sites web ou sources potentiels où l'on pourrait trouver plus d'informations sur ce sujet.
+4. Pour chaque source:
+   - Donne un titre pour la source
+   - Fournis une brève description de quelles informations cette source pourrait fournir
+   - Si possible, suggère une URL hypothétique où ces informations pourraient être trouvées
 
-Format your response so each potential source is clearly separated and numbered.
-The list should be ranked by relevance, with the most relevant sources first.
+Formate ta réponse de manière à ce que chaque source potentielle soit clairement séparée et numérotée.
+La liste doit être classée par pertinence, avec les sources les plus pertinentes en premier.
+Réponds en français uniquement.
 `;
 
     const response = await fetch(`${normalizedUrl}/api/generate`, {
@@ -158,7 +160,7 @@ export async function askQuestionAboutImage(
     console.log("Using model:", modelId);
     console.log("Question:", question);
     
-    // Prepare the request to Ollama
+    // Prepare the request to Ollama with instruction to respond in French
     const response = await fetch(`${normalizedUrl}/api/generate`, {
       method: "POST",
       headers: {
@@ -166,7 +168,7 @@ export async function askQuestionAboutImage(
       },
       body: JSON.stringify({
         model: modelId,
-        prompt: question,
+        prompt: `${question}\n\nRéponds en français s'il te plaît.`,
         stream: false,
         images: [imageBase64.split(",")[1]],
       }),
