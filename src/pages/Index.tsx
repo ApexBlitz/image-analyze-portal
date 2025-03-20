@@ -1,5 +1,5 @@
+
 import React, { useState } from "react";
-import Header from "@/components/Header";
 import OllamaUrlInput from "@/components/OllamaUrlInput";
 import ImageUpload from "@/components/ImageUpload";
 import ImageAnalysis from "@/components/ImageAnalysis";
@@ -10,7 +10,7 @@ import InstallationGuide from "@/components/InstallationGuide";
 import { analyzeImage, checkModelAvailability } from "@/lib/api";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertTriangle, Zap } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Index = () => {
@@ -90,9 +90,7 @@ const Index = () => {
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-gray-100 -z-10"></div>
       
       <div className="w-full max-w-5xl px-6 py-8 flex flex-col items-center">
-        <Header />
-        
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mt-8">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mt-4">
           <TabsList className="grid w-full max-w-md mx-auto grid-cols-4">
             <TabsTrigger value="analyze" className="rounded-md">Analyse d'image</TabsTrigger>
             <TabsTrigger value="installation" className="rounded-md">Installation</TabsTrigger>
@@ -151,23 +149,6 @@ const Index = () => {
           </TabsContent>
         </Tabs>
       </div>
-      
-      <footer className="w-full mt-auto py-10 bg-white/50 backdrop-blur-sm border-t border-gray-200">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex items-center">
-              <Zap className="h-5 w-5 text-blue-500 mr-2" />
-              <span className="font-medium">Vision Insight</span>
-            </div>
-            <p className="text-gray-500 text-sm">
-              Analyse d'images intelligente propulsée par Ollama
-            </p>
-            <div className="text-xs text-gray-400">
-              {selectedModel && ollamaUrl ? `Connecté à ${selectedModel}` : "Non connecté"}
-            </div>
-          </div>
-        </div>
-      </footer>
     </main>
   );
 };
