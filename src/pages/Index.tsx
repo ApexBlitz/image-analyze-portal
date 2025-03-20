@@ -4,14 +4,10 @@ import OllamaUrlInput from "@/components/OllamaUrlInput";
 import ImageUpload from "@/components/ImageUpload";
 import ImageAnalysis from "@/components/ImageAnalysis";
 import ModelSelector from "@/components/ModelSelector";
-import HowItWorks from "@/components/HowItWorks";
-import Features from "@/components/Features";
-import InstallationGuide from "@/components/InstallationGuide";
 import { analyzeImage, checkModelAvailability } from "@/lib/api";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Index = () => {
   const [ollamaUrl, setOllamaUrl] = useState<string | null>(null);
@@ -20,7 +16,6 @@ const Index = () => {
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
   const [selectedModel, setSelectedModel] = useState<string>("llava");
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<string>("analyze");
 
   const handleOllamaUrlSubmit = async (url: string) => {
     setOllamaUrl(url);
@@ -90,64 +85,43 @@ const Index = () => {
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-gray-100 -z-10"></div>
       
       <div className="w-full max-w-5xl px-6 py-8 flex flex-col items-center">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mt-4">
-          <TabsList className="grid w-full max-w-md mx-auto grid-cols-4">
-            <TabsTrigger value="analyze" className="rounded-md">Analyse d'image</TabsTrigger>
-            <TabsTrigger value="installation" className="rounded-md">Installation</TabsTrigger>
-            <TabsTrigger value="howItWorks" className="rounded-md">Comment ça marche</TabsTrigger>
-            <TabsTrigger value="features" className="rounded-md">Fonctionnalités</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="analyze" className="w-full pt-6">
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm p-6 mb-8">
-              <div className="flex flex-col md:flex-row gap-6 items-start">
-                <OllamaUrlInput 
-                  onUrlSubmit={handleOllamaUrlSubmit} 
-                  isAnalyzing={isAnalyzing} 
-                />
-                
-                <ModelSelector
-                  selectedModel={selectedModel}
-                  onModelChange={handleModelChange}
-                  isAnalyzing={isAnalyzing}
-                />
-              </div>
+        <div className="w-full">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm p-6 mb-8">
+            <div className="flex flex-col md:flex-row gap-6 items-start">
+              <OllamaUrlInput 
+                onUrlSubmit={handleOllamaUrlSubmit} 
+                isAnalyzing={isAnalyzing} 
+              />
               
-              {error && (
-                <Alert variant="destructive" className="my-4 max-w-xl w-full">
-                  <AlertTriangle className="h-4 w-4 mr-2" />
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
+              <ModelSelector
+                selectedModel={selectedModel}
+                onModelChange={handleModelChange}
+                isAnalyzing={isAnalyzing}
+              />
             </div>
             
-            <ImageUpload 
-              onImageUpload={handleImageUpload} 
-              isAnalyzing={isAnalyzing}
-              hasOllamaUrl={!!ollamaUrl}
-            />
-            
-            <ImageAnalysis 
-              result={analysisResult} 
-              isAnalyzing={isAnalyzing}
-              imageBase64={imageBase64}
-              ollamaUrl={ollamaUrl}
-              selectedModel={selectedModel}
-            />
-          </TabsContent>
+            {error && (
+              <Alert variant="destructive" className="my-4 max-w-xl w-full">
+                <AlertTriangle className="h-4 w-4 mr-2" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+          </div>
           
-          <TabsContent value="installation" className="pt-6">
-            <InstallationGuide />
-          </TabsContent>
+          <ImageUpload 
+            onImageUpload={handleImageUpload} 
+            isAnalyzing={isAnalyzing}
+            hasOllamaUrl={!!ollamaUrl}
+          />
           
-          <TabsContent value="howItWorks" className="pt-6">
-            <HowItWorks />
-          </TabsContent>
-          
-          <TabsContent value="features" className="pt-6">
-            <Features />
-          </TabsContent>
-        </Tabs>
+          <ImageAnalysis 
+            result={analysisResult} 
+            isAnalyzing={isAnalyzing}
+            imageBase64={imageBase64}
+            ollamaUrl={ollamaUrl}
+            selectedModel={selectedModel}
+          />
+        </div>
       </div>
     </main>
   );

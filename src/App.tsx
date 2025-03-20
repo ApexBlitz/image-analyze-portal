@@ -9,6 +9,7 @@ import NotFound from "./pages/NotFound";
 import OtherModels from "./pages/OtherModels";
 import Contact from "./pages/Contact";
 import AboutPage from "./pages/AboutPage";
+import Documentation from "./pages/Documentation";
 import NavBar from "./components/NavBar";
 
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const App = () => (
         <NavBar />
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/documentation" element={<Documentation />} />
           <Route path="/models" element={<OtherModels />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/about" element={<AboutPage />} />
