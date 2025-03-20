@@ -44,3 +44,10 @@ export interface OpenAIResponse {
     finish_reason: string;
   }>;
 }
+
+export interface OpenAIVisionModel {
+  id: string;
+  name: string;
+  description: string;
+  pricing: string;
+}

@@ -3,7 +3,13 @@ import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Key } from "lucide-react";
+import { Key, Info } from "lucide-react";
+import { 
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface OpenAITokenInputProps {
   onTokenSubmit: (token: string) => void;
@@ -37,6 +43,20 @@ const OpenAITokenInput: React.FC<OpenAITokenInputProps> = ({
         <label htmlFor="openai-token" className="text-sm font-medium block mb-2 text-gray-700 flex items-center gap-2">
           <Key className="h-4 w-4" />
           Token API OpenAI
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Info className="h-4 w-4 text-gray-400 cursor-help" />
+            </TooltipTrigger>
+            <TooltipContent className="w-80 p-3">
+              <p className="font-medium mb-1">Modèles supportés:</p>
+              <ul className="text-xs">
+                <li className="mb-1">• GPT-4o - Modèle multimodal performant</li>
+                <li className="mb-1">• GPT-4o Mini - Version plus légère et économique</li>
+                <li className="mb-1">• GPT-4 Turbo - Version améliorée de GPT-4</li>
+              </ul>
+              <p className="text-xs mt-2">Vous aurez besoin d'un compte OpenAI avec des crédits actifs.</p>
+            </TooltipContent>
+          </Tooltip>
         </label>
         <div className="flex gap-2">
           <Input
