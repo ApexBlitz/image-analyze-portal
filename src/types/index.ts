@@ -18,3 +18,29 @@ export interface OllamaModel {
   name: string;
   description: string;
 }
+
+export interface OpenAIMessage {
+  role: "system" | "user" | "assistant";
+  content: string | Array<{
+    type: "text" | "image_url";
+    text?: string;
+    image_url?: {
+      url: string;
+    };
+  }>;
+}
+
+export interface OpenAIResponse {
+  id: string;
+  object: string;
+  created: number;
+  model: string;
+  choices: Array<{
+    index: number;
+    message: {
+      role: string;
+      content: string;
+    };
+    finish_reason: string;
+  }>;
+}

@@ -4,50 +4,108 @@ import { OllamaResponse } from "@/types";
 
 export async function analyzeImage(
   imageBase64: string,
-  ollamaUrl: string,
-  modelId: string = "llava"
+  apiToken: string,
+  modelId: string = "llava",
+  provider: "ollama" | "openai" = "ollama"
 ): Promise<string> {
   try {
-    // First, validate the Ollama URL
-    if (!ollamaUrl.startsWith("http://") && !ollamaUrl.startsWith("https://")) {
-      throw new Error("Invalid Ollama URL. It must start with http:// or https://");
+    if (provider === "ollama") {
+      return await analyzeImageWithOllama(imageBase64, apiToken, modelId);
+    } else {
+      return await analyzeImageWithOpenAI(imageBase64, apiToken, modelId);
     }
-
-    const normalizedUrl = ollamaUrl.endsWith("/")
-      ? ollamaUrl.slice(0, -1)
-      : ollamaUrl;
-    
-    console.log("Sending request to Ollama:", `${normalizedUrl}/api/generate`);
-    console.log("Using model:", modelId);
-    
-    // Prepare the request to Ollama with a prompt in French
-    const response = await fetch(`${normalizedUrl}/api/generate`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: modelId,
-        prompt: "Décris cette image en détail en français. Que vois-tu ? Liste les objets, les personnes, le contexte, et tous les détails intéressants.",
-        stream: false,
-        images: [imageBase64.split(",")[1]],
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Ollama API error:", response.status, errorText);
-      throw new Error(`Ollama API error: ${response.status} - ${errorText || response.statusText}`);
-    }
-
-    const data = await response.json() as OllamaResponse;
-    return data.response;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error("Analysis error details:", errorMessage);
     toast.error(`Analyse échouée: ${errorMessage}`);
     throw error;
   }
+}
+
+async function analyzeImageWithOllama(
+  imageBase64: string,
+  ollamaUrl: string,
+  modelId: string
+): Promise<string> {
+  // First, validate the Ollama URL
+  if (!ollamaUrl.startsWith("http://") && !ollamaUrl.startsWith("https://")) {
+    throw new Error("Invalid Ollama URL. It must start with http:// or https://");
+  }
+
+  const normalizedUrl = ollamaUrl.endsWith("/")
+    ? ollamaUrl.slice(0, -1)
+    : ollamaUrl;
+  
+  console.log("Sending request to Ollama:", `${normalizedUrl}/api/generate`);
+  console.log("Using model:", modelId);
+  
+  // Prepare the request to Ollama with a prompt in French
+  const response = await fetch(`${normalizedUrl}/api/generate`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: modelId,
+      prompt: "Décris cette image en détail en français. Que vois-tu ? Liste les objets, les personnes, le contexte, et tous les détails intéressants.",
+      stream: false,
+      images: [imageBase64.split(",")[1]],
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("Ollama API error:", response.status, errorText);
+    throw new Error(`Ollama API error: ${response.status} - ${errorText || response.statusText}`);
+  }
+
+  const data = await response.json() as OllamaResponse;
+  return data.response;
+}
+
+async function analyzeImageWithOpenAI(
+  imageBase64: string,
+  apiKey: string,
+  modelId: string
+): Promise<string> {
+  const url = "https://api.openai.com/v1/chat/completions";
+  
+  console.log("Sending request to OpenAI API");
+  console.log("Using model:", modelId);
+  
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: modelId,
+      messages: [
+        {
+          role: "system",
+          content: "Tu es un assistant spécialisé dans l'analyse d'images. Réponds toujours en français."
+        },
+        {
+          role: "user",
+          content: [
+            { type: "text", text: "Décris cette image en détail. Que vois-tu ? Liste les objets, les personnes, le contexte, et tous les détails intéressants." },
+            { type: "image_url", image_url: { url: imageBase64 } }
+          ]
+        }
+      ],
+      max_tokens: 1000
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("OpenAI API error:", response.status, errorText);
+    throw new Error(`OpenAI API error: ${response.status} - ${errorText || response.statusText}`);
+  }
+
+  const data = await response.json();
+  return data.choices[0].message.content;
 }
 
 // Add a function to check if a model is available
@@ -143,49 +201,110 @@ Réponds en français uniquement.
 export async function askQuestionAboutImage(
   imageBase64: string,
   question: string,
-  ollamaUrl: string,
-  modelId: string = "llava"
+  apiToken: string,
+  modelId: string = "llava",
+  provider: "ollama" | "openai" = "ollama"
 ): Promise<string> {
   try {
-    // First, validate the Ollama URL
-    if (!ollamaUrl.startsWith("http://") && !ollamaUrl.startsWith("https://")) {
-      throw new Error("Invalid Ollama URL. It must start with http:// or https://");
+    if (provider === "ollama") {
+      return await askQuestionWithOllama(imageBase64, question, apiToken, modelId);
+    } else {
+      return await askQuestionWithOpenAI(imageBase64, question, apiToken, modelId);
     }
-
-    const normalizedUrl = ollamaUrl.endsWith("/")
-      ? ollamaUrl.slice(0, -1)
-      : ollamaUrl;
-    
-    console.log("Sending question to Ollama:", `${normalizedUrl}/api/generate`);
-    console.log("Using model:", modelId);
-    console.log("Question:", question);
-    
-    // Prepare the request to Ollama with instruction to respond in French
-    const response = await fetch(`${normalizedUrl}/api/generate`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: modelId,
-        prompt: `${question}\n\nRéponds en français s'il te plaît.`,
-        stream: false,
-        images: [imageBase64.split(",")[1]],
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Ollama API error:", response.status, errorText);
-      throw new Error(`Ollama API error: ${response.status} - ${errorText || response.statusText}`);
-    }
-
-    const data = await response.json() as OllamaResponse;
-    return data.response;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error("Question handling error details:", errorMessage);
     toast.error(`Question échouée: ${errorMessage}`);
     throw error;
   }
+}
+
+async function askQuestionWithOllama(
+  imageBase64: string,
+  question: string,
+  ollamaUrl: string,
+  modelId: string
+): Promise<string> {
+  // First, validate the Ollama URL
+  if (!ollamaUrl.startsWith("http://") && !ollamaUrl.startsWith("https://")) {
+    throw new Error("Invalid Ollama URL. It must start with http:// or https://");
+  }
+
+  const normalizedUrl = ollamaUrl.endsWith("/")
+    ? ollamaUrl.slice(0, -1)
+    : ollamaUrl;
+  
+  console.log("Sending question to Ollama:", `${normalizedUrl}/api/generate`);
+  console.log("Using model:", modelId);
+  console.log("Question:", question);
+  
+  // Prepare the request to Ollama with instruction to respond in French
+  const response = await fetch(`${normalizedUrl}/api/generate`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: modelId,
+      prompt: `${question}\n\nRéponds en français s'il te plaît.`,
+      stream: false,
+      images: [imageBase64.split(",")[1]],
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("Ollama API error:", response.status, errorText);
+    throw new Error(`Ollama API error: ${response.status} - ${errorText || response.statusText}`);
+  }
+
+  const data = await response.json() as OllamaResponse;
+  return data.response;
+}
+
+async function askQuestionWithOpenAI(
+  imageBase64: string,
+  question: string,
+  apiKey: string,
+  modelId: string
+): Promise<string> {
+  const url = "https://api.openai.com/v1/chat/completions";
+  
+  console.log("Sending question to OpenAI API");
+  console.log("Using model:", modelId);
+  console.log("Question:", question);
+  
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: modelId,
+      messages: [
+        {
+          role: "system",
+          content: "Tu es un assistant spécialisé dans l'analyse d'images. Réponds toujours en français."
+        },
+        {
+          role: "user",
+          content: [
+            { type: "text", text: `${question}\n\nRéponds en français s'il te plaît.` },
+            { type: "image_url", image_url: { url: imageBase64 } }
+          ]
+        }
+      ],
+      max_tokens: 1000
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("OpenAI API error:", response.status, errorText);
+    throw new Error(`OpenAI API error: ${response.status} - ${errorText || response.statusText}`);
+  }
+
+  const data = await response.json();
+  return data.choices[0].message.content;
 }

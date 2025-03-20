@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { askQuestionAboutImage } from "@/lib/api";
-import { Loader2, MessageCircleQuestion, SendHorizontal, Clock, Bot, UserRound } from "lucide-react";
+import { Loader2, MessageCircleQuestion, SendHorizontal, Clock, Bot, UserRound, BrainCircuit } from "lucide-react";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
@@ -15,6 +15,7 @@ interface ImageQuestionsProps {
   ollamaUrl: string | null;
   selectedModel: string;
   isVisible: boolean;
+  modelProvider?: "ollama" | "openai";
 }
 
 interface QuestionAnswer {
@@ -27,7 +28,8 @@ const ImageQuestions: React.FC<ImageQuestionsProps> = ({
   imageBase64,
   ollamaUrl,
   selectedModel,
-  isVisible
+  isVisible,
+  modelProvider = "ollama"
 }) => {
   const [question, setQuestion] = useState<string>("");
   const [isAsking, setIsAsking] = useState<boolean>(false);
@@ -50,7 +52,8 @@ const ImageQuestions: React.FC<ImageQuestionsProps> = ({
         imageBase64,
         question,
         ollamaUrl,
-        selectedModel
+        selectedModel,
+        modelProvider
       );
 
       // Add to question history
@@ -91,8 +94,13 @@ const ImageQuestions: React.FC<ImageQuestionsProps> = ({
               <MessageCircleQuestion className="h-5 w-5 text-purple-500" />
               Questions sur l'image
             </h3>
-            <div className="inline-block px-2 py-1 rounded-full bg-purple-100 text-xs font-medium text-purple-700">
-              Modèle: {selectedModel}
+            <div className="inline-block px-2 py-1 rounded-full bg-purple-100 text-xs font-medium text-purple-700 flex items-center gap-1">
+              {modelProvider === "ollama" ? (
+                <Bot className="h-3 w-3" />
+              ) : (
+                <BrainCircuit className="h-3 w-3" />
+              )}
+              <span>{modelProvider === "ollama" ? "Ollama" : "OpenAI"}: {selectedModel}</span>
             </div>
           </div>
           <Separator className="my-2" />
@@ -145,7 +153,11 @@ const ImageQuestions: React.FC<ImageQuestionsProps> = ({
                       </div>
                     </div>
                     <div className="bg-white p-3 border border-gray-100 flex items-start gap-3">
-                      <Bot className="h-5 w-5 text-blue-600 mt-0.5" />
+                      {modelProvider === "ollama" ? (
+                        <Bot className="h-5 w-5 text-blue-600 mt-0.5" />
+                      ) : (
+                        <BrainCircuit className="h-5 w-5 text-green-600 mt-0.5" />
+                      )}
                       <p className="text-sm whitespace-pre-line flex-1">{qa.answer}</p>
                     </div>
                   </div>

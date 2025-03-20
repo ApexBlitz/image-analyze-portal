@@ -1,102 +1,103 @@
 
 import React from "react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { OllamaModel } from "@/types";
-
-// Liste des modèles supportés par Ollama avec capacité d'analyse d'image
-const SUPPORTED_MODELS: OllamaModel[] = [
-  {
-    id: "llava",
-    name: "LLaVA",
-    description: "Modèle multimodal text-image",
-  },
-  {
-    id: "bakllava",
-    name: "BakLLaVA",
-    description: "Modèle LLaVA entraîné sur Bakllava",
-  },
-  {
-    id: "moondream",
-    name: "Moondream",
-    description: "Petit modèle efficace pour l'analyse d'image",
-  },
-  {
-    id: "cogvlm",
-    name: "CogVLM",
-    description: "Modèle vision-langage pour compréhension d'image",
-  },
-  {
-    id: "deepseek-r1",
-    name: "DeepSeek-R1",
-    description: "Modèle avancé pour analyse et recherche web",
-  },
-  {
-    id: "llama3",
-    name: "Llama 3.3",
-    description: "Modèle multimodal pour compréhension complexe",
-  },
-  {
-    id: "phi-4",
-    name: "Phi-4",
-    description: "Modèle Microsoft avec capacités visuelles",
-  },
-  {
-    id: "mistral",
-    name: "Mistral",
-    description: "Modèle performant pour analyse et génération",
-  },
-  {
-    id: "gemma3:8b-vision",
-    name: "Gemma 3",
-    description: "Modèle vision-langage de Google",
-  },
-];
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Bot, BrainCircuit } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface ModelSelectorProps {
   selectedModel: string;
-  onModelChange: (modelId: string) => void;
+  onModelChange: (modelId: string, provider: "ollama" | "openai") => void;
   isAnalyzing: boolean;
+  modelProvider: "ollama" | "openai";
+  hasOllamaUrl: boolean;
+  hasOpenAIToken: boolean;
 }
 
 const ModelSelector: React.FC<ModelSelectorProps> = ({
   selectedModel,
   onModelChange,
   isAnalyzing,
+  modelProvider,
+  hasOllamaUrl,
+  hasOpenAIToken
 }) => {
+  const ollamaModels = [
+    { id: "llava", name: "LLaVA", description: "Vision Language Assistant" },
+    { id: "bakllava", name: "Bakllava", description: "Vers. améliorée de LLaVA" },
+    { id: "llava-phi3", name: "LLaVA-Phi3", description: "LLaVA basé sur Phi-3" },
+    { id: "moondream", name: "Moondream", description: "Modèle vision léger" },
+    { id: "cogvlm", name: "CogVLM", description: "Multimodal par THUDM" },
+    { id: "deepseek-r1", name: "DeepSeek VL", description: "Advanced Vision Language Model" }
+  ];
+
+  const openaiModels = [
+    { id: "gpt-4o", name: "GPT-4o", description: "Modèle multimodal performant" },
+    { id: "gpt-4o-mini", name: "GPT-4o Mini", description: "Version plus légère de GPT-4o" }
+  ];
+
+  const handleModelChange = (value: string) => {
+    onModelChange(value, modelProvider);
+  };
+
+  const handleProviderChange = (value: "ollama" | "openai") => {
+    if (value === "ollama") {
+      if (hasOllamaUrl) {
+        onModelChange("llava", "ollama");
+      }
+    } else if (value === "openai") {
+      if (hasOpenAIToken) {
+        onModelChange("gpt-4o", "openai");
+      }
+    }
+  };
+
+  const currentModels = modelProvider === "ollama" ? ollamaModels : openaiModels;
+
   return (
-    <div className="w-full max-w-md mx-auto mb-6 animate-slide-up">
-      <div className="glass rounded-xl p-4 backdrop-blur-md">
-        <label htmlFor="model-selector" className="text-sm font-medium block mb-2 text-gray-700">
-          Modèle d'IA pour l'analyse
-        </label>
-        <Select
-          disabled={isAnalyzing}
-          value={selectedModel}
-          onValueChange={onModelChange}
-        >
-          <SelectTrigger className="w-full" id="model-selector">
-            <SelectValue placeholder="Sélectionner un modèle" />
-          </SelectTrigger>
-          <SelectContent>
-            {SUPPORTED_MODELS.map((model) => (
-              <SelectItem key={model.id} value={model.id}>
-                <div className="flex flex-col">
-                  <span>{model.name}</span>
-                  <span className="text-xs text-gray-500">{model.description}</span>
-                </div>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <p className="text-xs text-gray-500 mt-2">
-          Assurez-vous que votre serveur Ollama a installé le modèle sélectionné
-        </p>
+    <div className="w-full">
+      <Tabs value={modelProvider} onValueChange={(v) => handleProviderChange(v as "ollama" | "openai")} className="mb-4">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger 
+            value="ollama" 
+            disabled={isAnalyzing || !hasOllamaUrl}
+            className="flex items-center gap-2"
+          >
+            <Bot className="h-4 w-4" /> 
+            <span>Ollama</span>
+          </TabsTrigger>
+          <TabsTrigger 
+            value="openai" 
+            disabled={isAnalyzing || !hasOpenAIToken}
+            className="flex items-center gap-2"
+          >
+            <BrainCircuit className="h-4 w-4" /> 
+            <span>OpenAI</span>
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
+
+      <Select onValueChange={handleModelChange} value={selectedModel} disabled={isAnalyzing}>
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder="Sélectionnez un modèle" />
+        </SelectTrigger>
+        <SelectContent>
+          {currentModels.map((model) => (
+            <SelectItem key={model.id} value={model.id}>
+              <div className="flex flex-col">
+                <span className="font-medium">{model.name}</span>
+                <span className="text-xs text-gray-500">{model.description}</span>
+              </div>
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      
+      <div className="mt-2 text-xs text-gray-500">
+        {modelProvider === "ollama" ? (
+          <p>Ces modèles s'exécutent localement sur votre machine via Ollama</p>
+        ) : (
+          <p>Ces modèles utilisent l'API OpenAI (nécessite un crédit)</p>
+        )}
       </div>
     </div>
   );
