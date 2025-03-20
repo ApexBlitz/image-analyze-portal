@@ -11,6 +11,8 @@ import Contact from "./pages/Contact";
 import AboutPage from "./pages/AboutPage";
 import Documentation from "./pages/Documentation";
 import NavBar from "./components/NavBar";
+import Footer from "./components/Footer";
+import CookieConsent from "./components/CookieConsent";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +32,8 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <Footer />
+        <CookieConsent />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
