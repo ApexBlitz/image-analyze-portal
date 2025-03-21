@@ -3,9 +3,19 @@ import React, { createContext, useState, useContext, ReactNode } from "react";
 
 type Language = "fr" | "en";
 
-interface Translations {
+// Define nested structure types for our translations
+interface TranslationValues {
+  [key: string]: string | NestedTranslationValues;
+}
+
+interface NestedTranslationValues {
+  [key: string]: string | NestedTranslationValues;
+}
+
+interface LanguageData {
   [key: string]: {
-    [key: string]: string;
+    en: TranslationValues;
+    fr: TranslationValues;
   };
 }
 
@@ -15,41 +25,8 @@ interface LanguageContextType {
   t: (key: string) => string;
 }
 
-const translations: Translations = {
-  app: {
-    en: {
-      name: "Vision AI",
-    },
-    fr: {
-      name: "Vision AI",
-    },
-  },
-  nav: {
-    en: {
-      home: "Home",
-      models: "Models",
-      documentation: "Documentation",
-      about: "About",
-      login: "Login",
-      register: "Register",
-      contact: "Contact",
-      account: "Account",
-      logout: "Logout",
-      subscription: "Subscription",
-    },
-    fr: {
-      home: "Accueil",
-      models: "Modèles",
-      documentation: "Documentation",
-      about: "À propos",
-      login: "Connexion",
-      register: "Inscription",
-      contact: "Contact",
-      account: "Compte",
-      logout: "Déconnexion",
-      subscription: "Abonnement",
-    },
-  },
+// Organize translations with proper nesting
+const translations: LanguageData = {
   app: {
     en: {
       name: "Vision AI",
@@ -72,6 +49,48 @@ const translations: Translations = {
         feature3: "Privé et sécurisé",
         start: "Commencer",
       },
+    },
+  },
+  nav: {
+    en: {
+      home: "Home",
+      models: "Models",
+      documentation: "Documentation",
+      about: "About",
+      login: "Login",
+      register: "Register",
+      contact: "Contact",
+      account: "Account",
+      logout: "Logout",
+      subscription: "Subscription",
+      imageAnalysis: "Image Analysis",
+      aiModels: "AI Models",
+      help: "Help",
+      installation: "Installation",
+      howItWorks: "How It Works",
+      features: "Features",
+      ollamaSite: "Ollama Website",
+      external: "External",
+    },
+    fr: {
+      home: "Accueil",
+      models: "Modèles",
+      documentation: "Documentation",
+      about: "À propos",
+      login: "Connexion",
+      register: "Inscription",
+      contact: "Contact",
+      account: "Compte",
+      logout: "Déconnexion",
+      subscription: "Abonnement",
+      imageAnalysis: "Analyse d'Images",
+      aiModels: "Modèles IA",
+      help: "Aide",
+      installation: "Installation",
+      howItWorks: "Fonctionnement",
+      features: "Fonctionnalités",
+      ollamaSite: "Site Ollama",
+      external: "Externe",
     },
   },
   footer: {
@@ -101,6 +120,8 @@ const translations: Translations = {
       loginButton: "Login",
       registerButton: "Register",
       googleLogin: "Login with Google",
+      withGoogle: "Continue with GitHub",
+      withEmail: "Or continue with",
       noAccount: "Don't have an account?",
       createAccount: "Create an account",
       haveAccount: "Already have an account?",
@@ -108,6 +129,12 @@ const translations: Translations = {
       requiredField: "This field is required",
       emailInvalid: "Please enter a valid email",
       passwordShort: "Password must be at least 6 characters",
+      fullName: "Full Name",
+      confirmPassword: "Confirm Password",
+      submit: "Login",
+      submitting: "Logging in...",
+      terms: "I agree to the",
+      login: "Login",
     },
     fr: {
       loginTitle: "Bon retour",
@@ -123,6 +150,8 @@ const translations: Translations = {
       loginButton: "Connexion",
       registerButton: "S'inscrire",
       googleLogin: "Connexion avec Google",
+      withGoogle: "Continuer avec GitHub",
+      withEmail: "Ou continuer avec",
       noAccount: "Vous n'avez pas de compte ?",
       createAccount: "Créer un compte",
       haveAccount: "Vous avez déjà un compte ?",
@@ -130,6 +159,12 @@ const translations: Translations = {
       requiredField: "Ce champ est obligatoire",
       emailInvalid: "Veuillez entrer un email valide",
       passwordShort: "Le mot de passe doit comporter au moins 6 caractères",
+      fullName: "Nom complet",
+      confirmPassword: "Confirmer le mot de passe",
+      submit: "Connexion",
+      submitting: "Connexion en cours...",
+      terms: "J'accepte les",
+      login: "Se connecter",
     },
   },
   cookie: {
@@ -462,6 +497,10 @@ const translations: Translations = {
       },
     },
   },
+  common: {
+    en: {},
+    fr: {},
+  },
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -508,13 +547,42 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     }
 
     // Try to get the translation in the current language
-    if (translations[section][language] && translations[section][language][item]) {
-      return translations[section][language][item];
+    try {
+      const sectionData = translations[section][language];
+      
+      // Handle nested keys
+      if (item.includes(".")) {
+        const itemParts = item.split(".");
+        let value: any = sectionData;
+        
+        for (const part of itemParts) {
+          if (value && typeof value === 'object' && part in value) {
+            value = value[part];
+          } else {
+            console.warn(`Translation missing for nested key part '${part}' in '${key}' (language: ${language})`);
+            return key;
+          }
+        }
+        
+        if (typeof value === 'string') {
+          return value;
+        } else {
+          console.warn(`Translation value for '${key}' is not a string (language: ${language})`);
+          return key;
+        }
+      } else {
+        // Direct access for simple keys
+        if (typeof sectionData[item] === 'string') {
+          return sectionData[item] as string;
+        } else {
+          console.warn(`Translation missing or not a string for key '${key}' in language '${language}'`);
+          return key;
+        }
+      }
+    } catch (error) {
+      console.warn(`Error accessing translation for key '${key}' in language '${language}': ${error}`);
+      return key;
     }
-
-    // Log warning for missing translation and return the key
-    console.warn(`Translation missing for key '${key}' in language '${language}'`);
-    return key;
   };
 
   return (

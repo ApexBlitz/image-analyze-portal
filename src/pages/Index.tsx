@@ -111,7 +111,9 @@ const Index = () => {
         if (errorMessage.includes("Failed to fetch") || errorMessage.includes("NetworkError")) {
           setError(`${t("errors.ollamaConnectionFailed")} ${ollamaUrl}`);
         } else if (errorMessage.includes("model not found")) {
-          setError(`${t("errors.modelNotInstalled", { model: selectedModel })}`);
+          const errorKey = "errors.modelNotInstalled";
+          const translatedError = t(errorKey).replace("{{model}}", selectedModel);
+          setError(translatedError);
         } else {
           setError(`${t("errors.analysisError")}: ${errorMessage}`);
         }

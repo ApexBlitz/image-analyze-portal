@@ -1,16 +1,14 @@
-
 import React from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Check, Info } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
 const Subscription = () => {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
@@ -69,8 +67,8 @@ const Subscription = () => {
       return;
     }
 
-    // In a real app, this would redirect to a payment page
-    toast.success(t("subscription.successToast", { plan: planId }));
+    const successMessage = t("subscription.successToast").replace("{{plan}}", planId);
+    toast.success(successMessage);
   };
 
   return (
