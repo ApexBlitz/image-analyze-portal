@@ -78,14 +78,14 @@ const Footer = () => {
         <div className="border-t border-gray-200 mt-6 pt-6 text-center text-xs text-gray-500">
           <p>© {new Date().getFullYear()} Vision IA. Tous droits réservés.</p>
           <div className="mt-2 space-x-4">
-            <Link to="/privacy" className="hover:underline">Politique de confidentialité</Link>
+            <Link to="/terms" className="hover:underline">Conditions d'utilisation</Link>
             <button 
               onClick={() => window.dispatchEvent(new Event('openCookieSettings'))}
               className="hover:underline"
             >
               Paramètres des cookies
             </button>
-            <Link to="/terms" className="hover:underline">Conditions d'utilisation</Link>
+            <Link to="/privacy" className="hover:underline">Politique de confidentialité</Link>
           </div>
         </div>
       </div>
