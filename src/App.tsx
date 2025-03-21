@@ -13,6 +13,7 @@ import Documentation from "./pages/Documentation";
 import Terms from "./pages/Terms";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
+import Subscription from "./pages/Subscription";
 import NavBar from "./components/NavBar";
 import Footer from "./components/Footer";
 import CookieConsent from "./components/CookieConsent";
@@ -39,6 +40,7 @@ const App = () => (
               <Route path="/terms" element={<Terms />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/subscription" element={<Subscription />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

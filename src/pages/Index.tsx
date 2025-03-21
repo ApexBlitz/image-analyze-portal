@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import OllamaUrlInput from "@/components/OllamaUrlInput";
 import OpenAITokenInput from "@/components/OpenAITokenInput";
@@ -9,8 +8,16 @@ import { analyzeImage, checkModelAvailability } from "@/lib/api";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
+import Header from "@/components/Header";
+import Features from "@/components/Features";
+import HowItWorks from "@/components/HowItWorks";
+import ImageMetadata from "@/components/ImageMetadata";
+import AcceptedFormats from "@/components/AcceptedFormats";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useLanguage } from "@/context/LanguageContext";
 
 const Index = () => {
+  const { t } = useLanguage();
   const [ollamaUrl, setOllamaUrl] = useState<string | null>(null);
   const [openaiToken, setOpenaiToken] = useState<string | null>(null);
   const [imageBase64, setImageBase64] = useState<string | null>(null);
@@ -19,6 +26,7 @@ const Index = () => {
   const [selectedModel, setSelectedModel] = useState<string>("llava");
   const [error, setError] = useState<string | null>(null);
   const [modelProvider, setModelProvider] = useState<"ollama" | "openai">("ollama");
+  const [activeTab, setActiveTab] = useState<string>("welcome");
 
   const handleOllamaUrlSubmit = async (url: string) => {
     setOllamaUrl(url);
@@ -42,7 +50,6 @@ const Index = () => {
     setOpenaiToken(token);
     setError(null);
     setModelProvider("openai");
-    // Set a default OpenAI model
     setSelectedModel("gpt-4o");
     toast.success("Token OpenAI enregistré!");
   };
@@ -75,12 +82,12 @@ const Index = () => {
     setError(null);
     
     if (modelProvider === "ollama" && !ollamaUrl) {
-      toast.error("Veuillez d'abord configurer l'URL d'Ollama");
+      toast.error(t("errors.configureOllamaFirst"));
       return;
     }
 
     if (modelProvider === "openai" && !openaiToken) {
-      toast.error("Veuillez d'abord configurer votre token API OpenAI");
+      toast.error(t("errors.configureOpenAIFirst"));
       return;
     }
 
@@ -95,26 +102,26 @@ const Index = () => {
       }
       
       setAnalysisResult(result);
-      toast.success("Analyse d'image terminée!");
+      toast.success(t("success.analysisComplete"));
     } catch (error) {
       console.error("Analysis error:", error);
       const errorMessage = error instanceof Error ? error.message : String(error);
       
       if (modelProvider === "ollama") {
         if (errorMessage.includes("Failed to fetch") || errorMessage.includes("NetworkError")) {
-          setError(`Impossible de se connecter au serveur Ollama. Vérifiez que le serveur est bien lancé à l'adresse ${ollamaUrl}`);
+          setError(`${t("errors.ollamaConnectionFailed")} ${ollamaUrl}`);
         } else if (errorMessage.includes("model not found")) {
-          setError(`Le modèle "${selectedModel}" n'est pas installé. Utilisez la commande "ollama pull ${selectedModel}" dans votre terminal pour l'installer.`);
+          setError(`${t("errors.modelNotInstalled", { model: selectedModel })}`);
         } else {
-          setError(`Erreur lors de l'analyse: ${errorMessage}`);
+          setError(`${t("errors.analysisError")}: ${errorMessage}`);
         }
       } else {
         if (errorMessage.includes("401")) {
-          setError("Token OpenAI invalide. Veuillez vérifier votre token API.");
+          setError(t("errors.invalidOpenAIToken"));
         } else if (errorMessage.includes("429")) {
-          setError("Limite de requêtes OpenAI atteinte. Veuillez réessayer plus tard.");
+          setError(t("errors.openAIRateLimit"));
         } else {
-          setError(`Erreur lors de l'analyse: ${errorMessage}`);
+          setError(`${t("errors.analysisError")}: ${errorMessage}`);
         }
       }
     } finally {
@@ -127,61 +134,84 @@ const Index = () => {
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-gray-100 -z-10"></div>
       
       <div className="w-full max-w-5xl px-6 py-8 flex flex-col items-center">
-        <div className="w-full">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm p-6 mb-8">
-            <div className="flex flex-col md:flex-row gap-6 items-start">
-              <div className="flex-1">
-                <h3 className="text-lg font-medium mb-3">Serveur Ollama Local</h3>
-                <OllamaUrlInput 
-                  onUrlSubmit={handleOllamaUrlSubmit} 
-                  isAnalyzing={isAnalyzing} 
-                />
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="mb-8 grid w-full max-w-md mx-auto grid-cols-3">
+            <TabsTrigger value="welcome" data-value="welcome">{t("tabs.welcome")}</TabsTrigger>
+            <TabsTrigger value="analyze" data-value="analyze">{t("tabs.analyze")}</TabsTrigger>
+            <TabsTrigger value="how" data-value="how">{t("tabs.howItWorks")}</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="welcome" className="pb-12">
+            <Header />
+            <Features />
+          </TabsContent>
+          
+          <TabsContent value="analyze">
+            <div className="w-full">
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm p-6 mb-8">
+                <div className="flex flex-col md:flex-row gap-6 items-start">
+                  <div className="flex-1">
+                    <h3 className="text-lg font-medium mb-3">{t("ollamaSection.title")}</h3>
+                    <OllamaUrlInput 
+                      onUrlSubmit={handleOllamaUrlSubmit} 
+                      isAnalyzing={isAnalyzing} 
+                    />
+                  </div>
+                  
+                  <div className="flex-1">
+                    <h3 className="text-lg font-medium mb-3">{t("openaiSection.title")}</h3>
+                    <OpenAITokenInput
+                      onTokenSubmit={handleOpenAITokenSubmit}
+                      isAnalyzing={isAnalyzing}
+                    />
+                  </div>
+                </div>
+                
+                <div className="mt-6">
+                  <h3 className="text-lg font-medium mb-3">{t("modelSection.title")}</h3>
+                  <ModelSelector
+                    selectedModel={selectedModel}
+                    onModelChange={handleModelChange}
+                    isAnalyzing={isAnalyzing}
+                    modelProvider={modelProvider}
+                    hasOllamaUrl={!!ollamaUrl}
+                    hasOpenAIToken={!!openaiToken}
+                  />
+                </div>
+                
+                {error && (
+                  <Alert variant="destructive" className="my-4 max-w-xl w-full">
+                    <AlertTriangle className="h-4 w-4 mr-2" />
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
               </div>
               
-              <div className="flex-1">
-                <h3 className="text-lg font-medium mb-3">OpenAI API</h3>
-                <OpenAITokenInput
-                  onTokenSubmit={handleOpenAITokenSubmit}
-                  isAnalyzing={isAnalyzing}
-                />
-              </div>
-            </div>
-            
-            <div className="mt-6">
-              <h3 className="text-lg font-medium mb-3">Sélection du modèle</h3>
-              <ModelSelector
-                selectedModel={selectedModel}
-                onModelChange={handleModelChange}
+              <AcceptedFormats />
+              
+              <ImageUpload 
+                onImageUpload={handleImageUpload} 
                 isAnalyzing={isAnalyzing}
+                hasOllamaUrl={!!ollamaUrl || !!openaiToken}
+              />
+              
+              <ImageMetadata imageBase64={imageBase64} />
+              
+              <ImageAnalysis 
+                result={analysisResult} 
+                isAnalyzing={isAnalyzing}
+                imageBase64={imageBase64}
+                ollamaUrl={ollamaUrl}
+                selectedModel={selectedModel}
                 modelProvider={modelProvider}
-                hasOllamaUrl={!!ollamaUrl}
-                hasOpenAIToken={!!openaiToken}
               />
             </div>
-            
-            {error && (
-              <Alert variant="destructive" className="my-4 max-w-xl w-full">
-                <AlertTriangle className="h-4 w-4 mr-2" />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-          </div>
+          </TabsContent>
           
-          <ImageUpload 
-            onImageUpload={handleImageUpload} 
-            isAnalyzing={isAnalyzing}
-            hasOllamaUrl={!!ollamaUrl || !!openaiToken}
-          />
-          
-          <ImageAnalysis 
-            result={analysisResult} 
-            isAnalyzing={isAnalyzing}
-            imageBase64={imageBase64}
-            ollamaUrl={ollamaUrl}
-            selectedModel={selectedModel}
-            modelProvider={modelProvider}
-          />
-        </div>
+          <TabsContent value="how">
+            <HowItWorks />
+          </TabsContent>
+        </Tabs>
       </div>
     </main>
   );
