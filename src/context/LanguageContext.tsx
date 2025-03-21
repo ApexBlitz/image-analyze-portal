@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, ReactNode } from "react";
 
 type Language = "fr" | "en";
@@ -38,6 +37,51 @@ const translations: LanguageData = {
         feature3: "Private & Secure",
         start: "Get Started",
       },
+      nav: {
+        home: "Home",
+        models: "Models",
+        documentation: "Documentation",
+        about: "About",
+        login: "Login",
+        register: "Register",
+        contact: "Contact",
+        account: "Account",
+        logout: "Logout",
+        subscription: "Subscription",
+        imageAnalysis: "Image Analysis",
+        aiModels: "AI Models",
+        help: "Help",
+        installation: "Installation",
+        howItWorks: "How It Works",
+        features: "Features",
+        ollamaSite: "Ollama Website",
+        external: "External",
+      },
+      footer: {
+        subtitle: "AI-powered image analysis platform",
+        madeWith: "Made with",
+        by: "by Vision AI Team",
+        links: "Links",
+        resources: "Resources",
+        home: "Home",
+        about: "About",
+        documentation: "Documentation",
+        models: "Models",
+        contact: "Contact",
+        rights: "All rights reserved",
+        terms: "Terms of Service",
+        privacy: "Privacy Policy",
+        cookies: "Cookie Settings",
+      },
+      features: {
+        title: "Key Features",
+        subtitle: "Discover what makes Vision AI the perfect tool for image analysis",
+        cta: {
+          title: "Ready to analyze your images?",
+          subtitle: "Start using Vision AI today and unlock the power of AI image analysis",
+          button: "Try it now"
+        }
+      }
     },
     fr: {
       name: "Vision AI",
@@ -49,6 +93,51 @@ const translations: LanguageData = {
         feature3: "Privé et sécurisé",
         start: "Commencer",
       },
+      nav: {
+        home: "Accueil",
+        models: "Modèles",
+        documentation: "Documentation",
+        about: "À propos",
+        login: "Connexion",
+        register: "Inscription",
+        contact: "Contact",
+        account: "Compte",
+        logout: "Déconnexion",
+        subscription: "Abonnement",
+        imageAnalysis: "Analyse d'Images",
+        aiModels: "Modèles IA",
+        help: "Aide",
+        installation: "Installation",
+        howItWorks: "Fonctionnement",
+        features: "Fonctionnalités",
+        ollamaSite: "Site Ollama",
+        external: "Externe",
+      },
+      footer: {
+        subtitle: "Plateforme d'analyse d'images propulsée par l'IA",
+        madeWith: "Fait avec",
+        by: "par l'équipe Vision AI",
+        links: "Liens",
+        resources: "Ressources",
+        home: "Accueil",
+        about: "À propos",
+        documentation: "Documentation",
+        models: "Modèles",
+        contact: "Contact",
+        rights: "Tous droits réservés",
+        terms: "Conditions d'utilisation",
+        privacy: "Politique de confidentialité",
+        cookies: "Paramètres des cookies",
+      },
+      features: {
+        title: "Fonctionnalités Clés",
+        subtitle: "Découvrez ce qui fait de Vision AI l'outil parfait pour l'analyse d'images",
+        cta: {
+          title: "Prêt à analyser vos images ?",
+          subtitle: "Commencez à utiliser Vision AI aujourd'hui et découvrez la puissance de l'analyse d'images par IA",
+          button: "Essayez maintenant"
+        }
+      }
     },
   },
   nav: {
@@ -115,8 +204,8 @@ const translations: LanguageData = {
       emailPlaceholder: "Enter your email",
       passwordLabel: "Password",
       passwordPlaceholder: "Enter your password",
-      namePlaceholder: "Enter your name",
       nameLabel: "Name",
+      namePlaceholder: "Enter your name",
       loginButton: "Login",
       registerButton: "Register",
       googleLogin: "Login with Google",
@@ -201,6 +290,11 @@ const translations: LanguageData = {
         title: "Interactive Questions",
         description: "Ask specific questions about your images and get detailed answers.",
       },
+      cta: {
+        title: "Ready to analyze your images?",
+        subtitle: "Start using Vision AI today and unlock the power of AI image analysis",
+        button: "Try it now"
+      }
     },
     fr: {
       title: "Fonctionnalités Clés",
@@ -221,6 +315,11 @@ const translations: LanguageData = {
         title: "Questions interactives",
         description: "Posez des questions spécifiques sur vos images et obtenez des réponses détaillées.",
       },
+      cta: {
+        title: "Prêt à analyser vos images ?",
+        subtitle: "Commencez à utiliser Vision AI aujourd'hui et découvrez la puissance de l'analyse d'images par IA",
+        button: "Essayez maintenant"
+      }
     },
   },
   how: {
