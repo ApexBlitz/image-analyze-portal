@@ -18,19 +18,22 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useAuth } from "@/context/AuthContext";
-
-const formSchema = z.object({
-  email: z.string().email("Adresse email invalide"),
-  password: z
-    .string()
-    .min(6, "Le mot de passe doit contenir au moins 6 caractères"),
-});
-
-type FormValues = z.infer<typeof formSchema>;
+import { useLanguage } from "@/context/LanguageContext";
 
 const Login = () => {
   const navigate = useNavigate();
   const { login, loginWithGoogle, isAuthenticated } = useAuth();
+  const { t, language } = useLanguage();
+
+  // Create and validate form schema depending on the language
+  const formSchema = z.object({
+    email: z.string().email(language === "fr" ? "Adresse email invalide" : "Invalid email address"),
+    password: z
+      .string()
+      .min(6, language === "fr" ? "Le mot de passe doit contenir au moins 6 caractères" : "Password must be at least 6 characters"),
+  });
+
+  type FormValues = z.infer<typeof formSchema>;
 
   React.useEffect(() => {
     if (isAuthenticated) {
@@ -67,9 +70,9 @@ const Login = () => {
   return (
     <div className="container max-w-md mx-auto px-6 py-12">
       <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold">Connexion</h1>
+        <h1 className="text-2xl font-bold">{t("auth.login.title")}</h1>
         <p className="text-gray-600 mt-2">
-          Connectez-vous pour accéder à toutes les fonctionnalités
+          {t("auth.login.subtitle")}
         </p>
       </div>
 
@@ -80,7 +83,7 @@ const Login = () => {
           onClick={handleGoogleLogin}
         >
           <GithubIcon className="mr-2 h-4 w-4" />
-          Continuer avec Google
+          {t("auth.login.withGoogle")}
         </Button>
 
         <div className="relative">
@@ -89,7 +92,7 @@ const Login = () => {
           </div>
           <div className="relative flex justify-center text-xs uppercase">
             <span className="bg-background px-2 text-muted-foreground">
-              Ou avec email
+              {t("auth.login.withEmail")}
             </span>
           </div>
         </div>
@@ -101,7 +104,7 @@ const Login = () => {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>{t("auth.login.email")}</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="exemple@email.com"
@@ -119,7 +122,7 @@ const Login = () => {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Mot de passe</FormLabel>
+                  <FormLabel>{t("auth.login.password")}</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="••••••••"
@@ -134,11 +137,11 @@ const Login = () => {
 
             <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
               {form.formState.isSubmitting ? (
-                "Connexion en cours..."
+                t("auth.login.submitting")
               ) : (
                 <>
                   <LogIn className="mr-2 h-4 w-4" />
-                  Se connecter
+                  {t("auth.login.submit")}
                 </>
               )}
             </Button>
@@ -147,12 +150,12 @@ const Login = () => {
 
         <div className="text-center text-sm">
           <p className="text-gray-600">
-            Pas encore de compte ?{" "}
+            {t("auth.login.noAccount")}{" "}
             <Link
               to="/register"
               className="text-blue-600 hover:underline font-medium"
             >
-              Créer un compte
+              {t("auth.login.createAccount")}
             </Link>
           </p>
         </div>

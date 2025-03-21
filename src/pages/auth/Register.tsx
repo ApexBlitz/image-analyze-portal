@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,35 +19,38 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useAuth } from "@/context/AuthContext";
-
-const formSchema = z
-  .object({
-    name: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
-    email: z.string().email("Adresse email invalide"),
-    password: z
-      .string()
-      .min(6, "Le mot de passe doit contenir au moins 6 caractères"),
-    confirmPassword: z.string(),
-    terms: z.boolean().refine((val) => val === true, {
-      message: "Vous devez accepter les conditions d'utilisation",
-    }),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Les mots de passe ne correspondent pas",
-    path: ["confirmPassword"],
-  });
-
-type FormValues = z.infer<typeof formSchema>;
+import { useLanguage } from "@/context/LanguageContext";
 
 const Register = () => {
   const navigate = useNavigate();
   const { register, loginWithGoogle, isAuthenticated } = useAuth();
+  const { t, language } = useLanguage();
 
   React.useEffect(() => {
     if (isAuthenticated) {
       navigate("/");
     }
   }, [isAuthenticated, navigate]);
+
+  // Create and validate form schema depending on the language
+  const formSchema = z
+    .object({
+      name: z.string().min(2, language === "fr" ? "Le nom doit contenir au moins 2 caractères" : "Name must be at least 2 characters"),
+      email: z.string().email(language === "fr" ? "Adresse email invalide" : "Invalid email address"),
+      password: z
+        .string()
+        .min(6, language === "fr" ? "Le mot de passe doit contenir au moins 6 caractères" : "Password must be at least 6 characters"),
+      confirmPassword: z.string(),
+      terms: z.boolean().refine((val) => val === true, {
+        message: language === "fr" ? "Vous devez accepter les conditions d'utilisation" : "You must accept the terms of use",
+      }),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: language === "fr" ? "Les mots de passe ne correspondent pas" : "Passwords do not match",
+      path: ["confirmPassword"],
+    });
+
+  type FormValues = z.infer<typeof formSchema>;
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -80,9 +84,9 @@ const Register = () => {
   return (
     <div className="container max-w-md mx-auto px-6 py-12">
       <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold">Créer un compte</h1>
+        <h1 className="text-2xl font-bold">{t("auth.register.title")}</h1>
         <p className="text-gray-600 mt-2">
-          Inscrivez-vous pour accéder à toutes les fonctionnalités
+          {t("auth.register.subtitle")}
         </p>
       </div>
 
@@ -93,7 +97,7 @@ const Register = () => {
           onClick={handleGoogleLogin}
         >
           <GithubIcon className="mr-2 h-4 w-4" />
-          Continuer avec Google
+          {t("auth.register.withGoogle")}
         </Button>
 
         <div className="relative">
@@ -102,7 +106,7 @@ const Register = () => {
           </div>
           <div className="relative flex justify-center text-xs uppercase">
             <span className="bg-background px-2 text-muted-foreground">
-              Ou avec email
+              {t("auth.register.withEmail")}
             </span>
           </div>
         </div>
@@ -114,7 +118,7 @@ const Register = () => {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nom complet</FormLabel>
+                  <FormLabel>{t("auth.register.fullName")}</FormLabel>
                   <FormControl>
                     <Input placeholder="Jean Dupont" {...field} />
                   </FormControl>
@@ -128,7 +132,7 @@ const Register = () => {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>{t("auth.register.email")}</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="exemple@email.com"
@@ -146,7 +150,7 @@ const Register = () => {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Mot de passe</FormLabel>
+                  <FormLabel>{t("auth.register.password")}</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="••••••••"
@@ -164,7 +168,7 @@ const Register = () => {
               name="confirmPassword"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Confirmer le mot de passe</FormLabel>
+                  <FormLabel>{t("auth.register.confirmPassword")}</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="••••••••"
@@ -190,12 +194,12 @@ const Register = () => {
                   </FormControl>
                   <div className="space-y-1 leading-none">
                     <FormLabel>
-                      J'accepte les{" "}
+                      {t("auth.register.terms")}{" "}
                       <Link
                         to="/terms"
                         className="text-blue-600 hover:underline"
                       >
-                        conditions d'utilisation
+                        {t("app.footer.terms")}
                       </Link>
                     </FormLabel>
                     <FormMessage />
@@ -206,11 +210,11 @@ const Register = () => {
 
             <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
               {form.formState.isSubmitting ? (
-                "Inscription en cours..."
+                t("auth.register.submitting")
               ) : (
                 <>
                   <UserPlus className="mr-2 h-4 w-4" />
-                  Créer un compte
+                  {t("auth.register.submit")}
                 </>
               )}
             </Button>
@@ -219,12 +223,12 @@ const Register = () => {
 
         <div className="text-center text-sm">
           <p className="text-gray-600">
-            Déjà un compte ?{" "}
+            {t("auth.register.haveAccount")}{" "}
             <Link
               to="/login"
               className="text-blue-600 hover:underline font-medium"
             >
-              Se connecter
+              {t("auth.register.login")}
             </Link>
           </p>
         </div>

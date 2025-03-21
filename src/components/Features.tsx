@@ -12,6 +12,7 @@ import {
   Globe,
   Shield,
 } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface FeatureCardProps {
   icon: React.ElementType;
@@ -34,6 +35,8 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ icon: Icon, title, descriptio
 );
 
 const Features: React.FC = () => {
+  const { t } = useLanguage();
+  
   const features: FeatureCardProps[] = [
     {
       icon: Image,
@@ -94,9 +97,9 @@ const Features: React.FC = () => {
   return (
     <div className="w-full max-w-5xl mx-auto">
       <div className="text-center mb-12">
-        <h2 className="text-3xl font-bold mb-4">Fonctionnalités de Vision Insight</h2>
+        <h2 className="text-3xl font-bold mb-4">{t("app.features.title")}</h2>
         <p className="text-gray-600 max-w-2xl mx-auto">
-          Découvrez toutes les possibilités offertes par notre plateforme d'analyse d'images alimentée par l'IA.
+          {t("app.features.subtitle")}
         </p>
       </div>
 
@@ -114,9 +117,9 @@ const Features: React.FC = () => {
 
       <Card className="p-8 border-none bg-gradient-to-r from-blue-50 to-indigo-50">
         <div className="text-center">
-          <h3 className="text-2xl font-bold mb-4">Prêt à analyser vos images ?</h3>
+          <h3 className="text-2xl font-bold mb-4">{t("app.features.cta.title")}</h3>
           <p className="text-gray-700 mb-6 max-w-2xl mx-auto">
-            Connectez-vous à votre serveur Ollama et commencez à explorer le potentiel de l'analyse d'images par IA dès maintenant.
+            {t("app.features.cta.subtitle")}
           </p>
           <button 
             className="px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
@@ -125,7 +128,7 @@ const Features: React.FC = () => {
               if (analyzeTab) analyzeTab.click();
             }}
           >
-            Commencer l'analyse
+            {t("app.features.cta.button")}
           </button>
         </div>
       </Card>

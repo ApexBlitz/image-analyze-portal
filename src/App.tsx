@@ -17,6 +17,7 @@ import NavBar from "./components/NavBar";
 import Footer from "./components/Footer";
 import CookieConsent from "./components/CookieConsent";
 import { AuthProvider } from "./context/AuthContext";
+import { LanguageProvider } from "./context/LanguageContext";
 
 const queryClient = new QueryClient();
 
@@ -24,25 +25,27 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <AuthProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <NavBar />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/documentation" element={<Documentation />} />
-            <Route path="/models" element={<OtherModels />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          <Footer />
-          <CookieConsent />
-        </BrowserRouter>
+        <LanguageProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <NavBar />
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/documentation" element={<Documentation />} />
+              <Route path="/models" element={<OtherModels />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            <Footer />
+            <CookieConsent />
+          </BrowserRouter>
+        </LanguageProvider>
       </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
