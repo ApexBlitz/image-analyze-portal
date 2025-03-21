@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { LogIn, Google } from "lucide-react";
+import { LogIn, GithubIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -79,7 +79,7 @@ const Login = () => {
           className="w-full"
           onClick={handleGoogleLogin}
         >
-          <Google className="mr-2 h-4 w-4" />
+          <GithubIcon className="mr-2 h-4 w-4" />
           Continuer avec Google
         </Button>
 
